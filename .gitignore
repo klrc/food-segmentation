@@ -19,7 +19,7 @@ temp/
 test/
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__/MODEL_DIR
 *.py[cod]
 *$py.class
 
