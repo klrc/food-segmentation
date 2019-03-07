@@ -308,6 +308,6 @@ if __name__ == '__main__':
 
     # display_samples(6)
 
-    train(epoch_stage1=4)
+    train(epoch_stage1=50)
     detect()
     eval()
