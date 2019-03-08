@@ -46,6 +46,9 @@ if not os.path.exists(COCO_MODEL_PATH):
 IMG_WIDTH = 200
 IMG_HEIGHT = 150
 
+GPU_COUNT = 1
+IMAGES_PER_GPU = 1
+
 
 class ShapesConfig(Config):
     """Configuration for training on the toy shapes dataset.
@@ -57,8 +60,8 @@ class ShapesConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
+    GPU_COUNT = GPU_COUNT
+    IMAGES_PER_GPU = IMAGES_PER_GPU
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 30  # background + 3 shapes
@@ -226,18 +229,15 @@ def train(epoch_stage1=2, epoch_stage2=1):
 
 
 class InferenceConfig(ShapesConfig):
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
+    GPU_COUNT = GPU_COUNT
+    IMAGES_PER_GPU = IMAGES_PER_GPU
 
 
 inference_config = InferenceConfig()
 # Recreate the model in inference mode
-model = modellib.MaskRCNN(mode="inference",
-                          config=inference_config,
-                          model_dir=MODEL_DIR)
 
 
-def detect():
+def detect(model):
     # Get path to saved weights
     # Either set a specific path or find last trained weights
     # model_path = os.path.join(ROOT_DIR, ".h5 file name here")
@@ -280,7 +280,7 @@ def _get_ax(rows=1, cols=1, size=8):
     return ax
 
 
-def eval():
+def eval(model):
     # Compute VOC-Style mAP @ IoU=0.5
     # Running on 10 images. Increase for better accuracy.
     image_ids = np.random.choice(dataset_val.image_ids, 10)
@@ -307,7 +307,16 @@ def eval():
 if __name__ == '__main__':
 
     # display_samples(6)
+    # train(epoch_stage1=50)
+    # detect(model)
 
-    train(epoch_stage1=50)
-    detect()
-    eval()
+    model = modellib.MaskRCNN(
+        mode="inference", config=inference_config, model_dir=f'{MODEL_DIR}')
+
+    for h5 in os.listdir('.eval'):
+        if '0.h5' not in h5:
+            continue    # eval per 10 ep
+
+        print(f'eval: {h5}')
+        model.load_weights(f'.eval/{h5}', by_name=True)
+        eval(model)
