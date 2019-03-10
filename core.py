@@ -235,6 +235,8 @@ class InferenceConfig(ShapesConfig):
 
 inference_config = InferenceConfig()
 # Recreate the model in inference mode
+model = modellib.MaskRCNN(
+    mode="inference", config=inference_config, model_dir=f'{MODEL_DIR}')
 
 
 def detect(model):
@@ -310,10 +312,9 @@ if __name__ == '__main__':
     # train(epoch_stage1=50)
     # detect(model)
 
-    model = modellib.MaskRCNN(
-        mode="inference", config=inference_config, model_dir=f'{MODEL_DIR}')
-
-    for h5 in os.listdir('.eval'):
+    h5s = os.listdir('.eval')
+    h5s.sort()
+    for h5 in h5s:
         if '0.h5' not in h5:
             continue    # eval per 10 ep
 

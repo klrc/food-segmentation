@@ -4,11 +4,13 @@ This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on P
 
 # Getting Started
 * [preprocessing.py](preprocessing.py) generates the .feeder dir from your own dataset, which contains resized images divided into train/test. To have a quick start:
+  
     data_list = [x for x in scan_data(
         '/run/media/sh/My Passport/erkeyiyuan/数据/网络/netfood', # change these lines with your own dataset.
         '/run/media/sh/My Passport/erkeyiyuan/数据/本地菜品/压缩包')]
 
 * [core.py](core.py) if the .feeder dir is generated, and make sure the path to 'mask_rcnn_coco.h5' is set, you can do whatever you want with core.py.
+  
         # Directory to save logs and trained model
         MODEL_DIR = '.logs'
 
