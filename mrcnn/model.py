@@ -2745,6 +2745,7 @@ def compose_image_meta(image_id, original_image_shape, image_shape,
         [scale] +                     # size=1
         list(active_class_ids)        # size=num_classes
     )
+    print(meta)
     return meta
 
 

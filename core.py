@@ -19,6 +19,7 @@ from mrcnn.model import log
 
 # %matplotlib inline
 inter_num = 0
+np.set_printoptions(threshold=np.inf)
 
 feeder_path = '.feeder'
 
@@ -239,16 +240,7 @@ model = modellib.MaskRCNN(
     mode="inference", config=inference_config, model_dir=f'{MODEL_DIR}')
 
 
-def detect(model):
-    # Get path to saved weights
-    # Either set a specific path or find last trained weights
-    # model_path = os.path.join(ROOT_DIR, ".h5 file name here")
-    model_path = model.find_last()
-
-    # Load trained weights
-    print("Loading weights from ", model_path)
-    model.load_weights(model_path, by_name=True)
-
+def random_img():
     # Test on a random image
     image_id = random.choice(dataset_val.image_ids)
     original_image, image_meta, gt_class_id, gt_bbox, gt_mask = \
@@ -260,14 +252,20 @@ def detect(model):
     log("gt_class_id", gt_class_id)
     log("gt_bbox", gt_bbox)
     log("gt_mask", gt_mask)
-
-    results = model.detect([original_image], verbose=1)
-
-    r = results[0]
-    visualize.display_instances(original_image, r['rois'], r['masks'], r['class_ids'],
-                                dataset_val.class_names, r['scores'], ax=_get_ax())
     visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id,
                                 dataset_train.class_names, figsize=(8, 8))
+    return original_image
+
+
+def detect(model, img):
+    # Get path to saved weights
+    # Either set a specific path or find last trained weights
+    # model_path = os.path.join(ROOT_DIR, ".h5 file name here")
+    results = model.detect([img], verbose=1)
+    r = results[0]
+    visualize.display_instances(
+        img, r['rois'], r['masks'], r['class_ids'], dataset_val.class_names,
+        r['scores'])
 
 
 def _get_ax(rows=1, cols=1, size=8):
@@ -314,10 +312,18 @@ if __name__ == '__main__':
 
     h5s = os.listdir('.eval')
     h5s.sort()
-    for h5 in h5s:
-        if '0.h5' not in h5:
-            continue    # eval per 10 ep
 
-        print(f'eval: {h5}')
+    test_img = random_img()
+
+    for h5 in h5s:
+        # if '0.h5' not in h5:
+            # continue    # eval per 10 ep
+            # Load trained weights
+        print("Loading weights from ", h5)
         model.load_weights(f'.eval/{h5}', by_name=True)
-        eval(model)
+        detect(model, test_img)
+        line = str(model._anchor_cache)
+        import json
+        with open('test.json', 'w') as f:
+            json.dump(line, f)
+        break

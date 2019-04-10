@@ -5,10 +5,11 @@ import os
 import shutil
 from PIL import Image
 from PIL import ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def resize(input_img, output_img, width=200, height=150):
+def resize(input_img, output_img, width=128, height=128):
     img = Image.open(input_img)
     try:
         img = img.resize((width, height), Image.BILINEAR)
@@ -47,7 +48,7 @@ def scan_data(*dirs):
 
 def divide_feeder(data_list):
     np.random.shuffle(data_list)
-    _divide_idx = int(len(data_list)/5)
+    _divide_idx = int(len(data_list) / 5)
     return data_list[0:_divide_idx], data_list[_divide_idx:-1]
 
 
@@ -63,20 +64,21 @@ def gen_feeder(data, output_dir):
 
 
 if __name__ == '__main__':
+    # feeder_dir = '.feeder'
+    # mkdirs(feeder_dir)
+    #
+    # data_list = [x for x in scan_data(
+    #     '/run/media/sh/My Passport/erkeyiyuan/数据/网络/netfood',
+    #     '/run/media/sh/My Passport/erkeyiyuan/数据/本地菜品/压缩包')]
+    #
+    # TOTAL_TASKS = len(data_list)
+    # DONE_TASKS = 0
+    #
+    # test, train = divide_feeder(data_list)
+    #
+    # for x in test:
+    #     gen_feeder(x, f'{feeder_dir}/test')
+    # for x in train:
+    #     gen_feeder(x, f'{feeder_dir}/train')
 
-    feeder_dir = '.feeder'
-    mkdirs(feeder_dir)
-
-    data_list = [x for x in scan_data(
-        '/run/media/sh/My Passport/erkeyiyuan/数据/网络/netfood',
-        '/run/media/sh/My Passport/erkeyiyuan/数据/本地菜品/压缩包')]
-
-    TOTAL_TASKS = len(data_list)
-    DONE_TASKS = 0
-
-    test, train = divide_feeder(data_list)
-
-    for x in test:
-        gen_feeder(x, f'{feeder_dir}/test')
-    for x in train:
-        gen_feeder(x, f'{feeder_dir}/train')
+    resize('.feeder/test/img/baozi4.png', 'testimg.png')
